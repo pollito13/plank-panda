@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Plank Panda</title>
+    <title>Plank Panda 11.2</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -16,6 +16,7 @@
             --text: #37474F;
             --card: #FFFFFF;
             --danger: #ef5350;
+            --overachiever: #9C27B0;
         }
 
         body {
@@ -43,7 +44,13 @@
             align-items: center;
         }
 
-        .logo { font-weight: 700; color: var(--primary-dark); letter-spacing: 1px; font-size: 1.1rem; }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 8px; 
+        }
+
+        .logo { font-weight: 700; color: var(--primary-dark); letter-spacing: 1px; font-size: 1.15rem; }
 
         .header-actions { display: flex; gap: 8px; }
 
@@ -353,7 +360,25 @@
 <body>
 
     <header>
-        <div class="logo">PLANK PANDA</div>
+        <div class="logo-container">
+            <!-- Custom SVG Mascot Logo -->
+            <svg width="29" height="33" viewBox="0 0 129 147" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="47.5871" height="25.0146" rx="12.5073" transform="matrix(-1 -8.74228e-08 -8.74228e-08 1 69.5869 118)" fill="#333333"/>
+                <rect width="47.5871" height="25.0146" rx="12.5073" transform="matrix(-1 -8.74228e-08 -8.74228e-08 1 104.587 118)" fill="#333333"/>
+                <path d="M65 55.5C92.4715 55.5 114.5 75.7746 114.5 100.5C114.5 125.225 92.4715 145.5 65 145.5C37.5285 145.5 15.5 125.225 15.5 100.5C15.5 75.7746 37.5285 55.5 65 55.5Z" fill="white" stroke="#333333" stroke-width="3"/>
+                <rect x="111.443" y="67" width="47.5871" height="25.0146" rx="12.5073" transform="rotate(69.5808 111.443 67)" fill="#333333"/>
+                <rect width="47.5871" height="25.0146" rx="12.5073" transform="matrix(-0.348887 0.937165 0.937165 0.348887 16.6025 67)" fill="#333333"/>
+                <path d="M59.3975 6.43262C63.5704 6.05354 69.0369 6.00473 74.3838 6.53809C79.762 7.07459 84.8648 8.18504 88.4092 10.0322C99.1215 15.615 106.5 27.1347 106.5 40.4688C106.5 59.3153 91.7811 74.5 73.7383 74.5H59.2617C41.2189 74.5 26.5 59.3153 26.5 40.4688C26.5002 21.7343 40.9655 8.10702 59.3975 6.43262Z" fill="white" stroke="#333333" stroke-width="3"/>
+                <circle cx="97" cy="12" r="12" fill="#333333"/>
+                <circle cx="37" cy="12" r="12" fill="#333333"/>
+                <path d="M72.523 33.0213C73.3591 29.3995 76.5459 26.9316 80.0997 26.8569C83.1446 26.6149 85.7074 27.4542 87.5787 28.5011C90.9412 30.0399 92.8747 33.7766 92.0104 37.5204C91.187 41.0869 88.0841 43.5345 84.596 43.6796C82.1333 43.614 78.8875 42.8315 76.5801 41.857C73.4502 40.2196 71.6913 36.6237 72.523 33.0213Z" fill="#333333"/>
+                <circle cx="79.0439" cy="31.4319" r="2" fill="white"/>
+                <path d="M62.0103 33.0213C61.1742 29.3995 58.098 26.5065 54.5442 26.4319C51.4993 26.1899 48.4156 26.8846 46.5443 27.9315C43.1818 29.4703 41.6586 33.7766 42.5229 37.5204C43.3464 41.0869 46.4492 43.5345 49.9374 43.6797C52.4853 43.7857 55.7392 43.0153 57.9532 41.857C61.0831 40.2196 62.842 36.6238 62.0103 33.0213Z" fill="#333333"/>
+                <circle cx="2" cy="2" r="2" transform="matrix(-1 0 0 1 50.0439 30.4321)" fill="white"/>
+                <rect x="60" y="43" width="13" height="9" rx="4.5" fill="#333333"/>
+            </svg>
+            <span class="logo">PLANK PANDA</span>
+        </div>
         <div class="header-actions">
             <!-- Added Help Button -->
             <button class="header-btn" id="btnHelp" title="Help">?</button>
@@ -388,7 +413,7 @@
         <div class="timer-display" id="timer">00:00</div>
         
         <div class="daily-info">
-            <span>Daily Progress</span>
+            <span>Daily Progress 🔥 <span id="streakCount">0</span></span>
             <span id="dailyTotal">0:00 / 5:00</span>
         </div>
         <div class="progress-bar">
@@ -498,7 +523,8 @@
             wakeLock: null,
             userApiKey: "",
             useVoice: true,
-            theme: 'plain'
+            theme: 'plain',
+            streak: 0
         };
 
         let resetStage = 0;
@@ -523,6 +549,7 @@
             timer: document.getElementById('timer'),
             daily: document.getElementById('dailyTotal'),
             progress: document.getElementById('progress'),
+            streakCount: document.getElementById('streakCount'),
             btn: document.getElementById('toggleBtn'),
             panda: document.getElementById('panda'),
             sweat: document.getElementById('sweat'),
@@ -736,6 +763,8 @@
 
             const history = JSON.parse(localStorage.getItem('pp_history') || '{}');
             state.dailyTime = history[today] || 0;
+            state.streak = calculateStreak(history);
+            ui.streakCount.innerText = state.streak;
             updateUI();
 
             // Onboarding Check
@@ -743,6 +772,27 @@
             if (!hasSeenIntro) {
                 ui.modalHelp.classList.add('open');
             }
+        }
+
+        function calculateStreak(history) {
+            let streak = 0;
+            const today = new Date();
+            // Check yesterday, day before, etc.
+            // Simplified: Just checks if there is data for consecutive days backwards
+            for (let i = 0; i < 30; i++) {
+                const d = new Date();
+                d.setDate(today.getDate() - i);
+                const key = d.toISOString().split('T')[0];
+                if (history[key] && history[key] >= state.goalSeconds) {
+                    streak++;
+                } else if (i === 0 && (!history[key] || history[key] < state.goalSeconds)) {
+                    // If today isn't done yet, don't break streak, just don't count it yet
+                    continue; 
+                } else {
+                    break;
+                }
+            }
+            return streak;
         }
 
         function save() {
